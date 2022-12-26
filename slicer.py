@@ -180,11 +180,11 @@ def parse_financial_reports(workingdir):
                 date_range = format_date(line[0]) + ' – ' + format_date(line[1])
 
             # all fields of interest of the current line
-            quantity = int(line[5])
-            amount = Decimal(line[7])
-            currency = line[8]
-            product = line[12]
-            countrycode = line[17]
+            quantity = int(line[8])
+            amount = Decimal(line[10])
+            currency = line[13]
+            product = line[3]
+            countrycode = line[7]
 
             # add current line's product quantity and amount to dictionary
             products = countries.get(countrycode, dict())
@@ -232,7 +232,13 @@ def print_sales_by_corporation(sales, currencies, no_subtotals, only_subtotals):
 
             exchange_rate = tax_factor = Decimal('1.00000')
             if not country_currency == local_currency:
-                exchange_rate, tax_factor = currency_data[country_currency]
+                if not country_currency in currency_data:
+                    print("\t========================================================================")
+                    print('\t\tWARNING: Exchange rate for ' + country_currency + ' not found, assuming 1:1')
+                    print("\t========================================================================")
+                    exchange_rate, tax_factor = Decimal('1.00000'), Decimal('1.00000')
+                else:
+                    exchange_rate, tax_factor = currency_data[country_currency]
             exchange_rate_formatted = locale.format_string("%.5f", exchange_rate)
 
             for product in products_sold:
